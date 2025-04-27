@@ -92,9 +92,7 @@ class SecureHashTable {
   }
   set(key, value, ttl) {
     if (this.#count / this.#size > 0.75) this.#resize(this.#size * 2);
-
     const index = this.#hash(key);
-
     if (!this.#table[index]) {
       this.#table[index] = new LinkList();
     }
@@ -122,22 +120,27 @@ class SecureHashTable {
     const oldTable = this.#table;
     this.#size = newSize;
     this.#table = new Array(this.#size);
-    console.log(this.#table);
-
-    // for (let bucket of oldTable) {
-    //   console.log(bucket);
-
-    //   if (bucket) {
-    //     for (let [key, value, ttl] of bucket) {
-    //       console.log([key, value, ttl]);
-
-    //       this.set(key, value, ttl);
-    //     }
-    //   }
-    // }
+    for (let bucket of oldTable) {
+      if (bucket) {
+        for (let [key, value, ttl] of bucket) {
+          this.set(key, value, ttl);
+        }
+      }
+    }
   }
-  getTable() {
-    return this.#table;
+  values() {
+    let results = [];
+    for (let bucket of this.#table) {
+      if (bucket) {
+        for (let [_key, value, _ttl] of bucket) {
+          results.push(value);
+        }
+      }
+    }
+    return results;
+  }
+  keys() {
+    return Array.from(this.#keys);
   }
   getSize() {
     return this.#size;
@@ -148,6 +151,6 @@ const secureHashTable = new SecureHashTable(1);
 
 secureHashTable.set("name", "Rafe Uddaraj");
 secureHashTable.set("age", 21);
-// secureHashTable.set("country", "Bangladesh");
-// console.log(secureHashTable.getTable());
-console.log(secureHashTable.getTable());
+secureHashTable.set("country", "Bangladesh");
+console.log(secureHashTable.values());
+console.log(secureHashTable.keys());
